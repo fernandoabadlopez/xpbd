@@ -49,29 +49,39 @@ class DistanceConstraint extends Constraint{
     /**
      * COMPLETAR RESTRICCION
      * */
+    // Distancia actual entre partículas
     float dist = vd.mag();
-    if(dist == 0) return; // Evitar división por cero
+    if(dist < 1e-6) return; // Evitar división por cero (posiciones casi coincidentes)
 
-    // C = |x1 - x2| - d
+    // C = ||x_i - x_j|| - d  (función de restricción)
     C = dist - d;
 
-    // Normalizado desde part2 hacia part1
+    // n = (x_i - x_j) / ||x_i - x_j||  (gradiente con respecto a x_i)
     PVector n = vd.copy().div(dist);
 
     // Pesos (w) son las masas inversas: w = 1/mass; w == 0 => bloqueada
-    float w1 = part1.w;
-    float w2 = part2.w;
-    float denom = w1 + w2;
+    float w1 = part1.w; // w_i
+    float w2 = part2.w; // w_j
+    float denom = w1 + w2; // (w_i + w_j)
     if(denom == 0) return; // ambos bloqueados
 
-    // Corrección según PBD: desplazar proporcionalmente a w_i/denom
-    // k_coef ya contiene el coeficiente corregido para el número de iteraciones
-    PVector corr = PVector.mult(n, (k_coef * C) / denom);
+    // Factor escalar que aparece en las fórmulas.
+    // En la diapositiva original la corrección es:
+    //   Δp_i = - (w_i / (w_i + w_j)) * (||x_i - x_j|| - d) * n
+    //   Δp_j =  (w_j / (w_i + w_j)) * (||x_i - x_j|| - d) * n
+    // Aquí incluimos además el coeficiente de rigidez k' calculado en compute_k_coef():
+    float lambda = k_coef * C; // k' * C
 
-    if(w1 > 0)
-      part1.location.sub(PVector.mult(corr, w1));
-    if(w2 > 0)
-      part2.location.add(PVector.mult(corr, w2));
+    // Δp_i (vector) = - (w1/denom) * lambda * n
+    PVector dp_i = PVector.mult(n, - (w1 / denom) * lambda);
+    // Δp_j (vector) = (w2/denom) * lambda * n
+    PVector dp_j = PVector.mult(n, (w2 / denom) * lambda);
+
+    // Aplicar correcciones (no mover partículas bloqueadas w==0)
+    if (w1 > 0)
+      part1.location.add(dp_i);
+    if (w2 > 0)
+      part2.location.add(dp_j);
   }
   
   void display(float scale_px){

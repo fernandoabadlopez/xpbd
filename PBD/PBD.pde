@@ -13,10 +13,11 @@ PVector vel_viento= new PVector(0,0,0);
 
 // Control de simulación
 boolean paused = false;
-int sim_n_iters = 50;
+int sim_n_iters = 80;
 
 // Esfera oscilante
-Esfera esfera;
+// Temporalmente desactivada: comentar la variable para evitar uso
+// Esfera esfera;
 
 //modulo de la intensidad del viento
 float viento;
@@ -53,16 +54,17 @@ void setup(){
   system.set_n_iters(sim_n_iters);
   
   // Inicializar esfera oscilante
-  float esfera_radius = 0.25;      // radio en metros
-  float esfera_z_base = 0.15;      // altura base (m)
-  float esfera_amplitude = 0.10;   // amplitud de oscilación (m)
-  float esfera_speed = 1.0;        // velocidad angular (rad/s)
-  esfera = new Esfera(esfera_radius,
-                        esfera_z_base, 
-                        esfera_amplitude, 
-                        esfera_speed, 
-                        system, 
-                        scale_px);
+  // Código de la esfera comentado temporalmente
+  // float esfera_radius = 0.25;      // radio en metros
+  // float esfera_z_base = 0.15;      // altura base (m)
+  // float esfera_amplitude = 0.10;   // amplitud de oscilación (m)
+  // float esfera_speed = 1.0;        // velocidad angular (rad/s)
+  // esfera = new Esfera(esfera_radius,
+  //                      esfera_z_base, 
+  //                      esfera_amplitude, 
+  //                      esfera_speed, 
+  //                      system, 
+  //                      scale_px);
   
 }
 
@@ -93,8 +95,9 @@ void draw(){
     aplica_viento();
     system.run(dt);  
     // Actualiza posición de la esfera oscilante y aplica colisiones
-    esfera.update(frameCount*dt);
-    esfera.applyCollision();
+    // Llamadas a la esfera desactivadas temporalmente
+    // esfera.update(frameCount*dt);
+    // esfera.applyCollision();
   }
 
   display();
@@ -143,7 +146,8 @@ void display(){
       system.constraints.get(i).display(scale_px);
       
   // Dibujar esfera oscilante
-  esfera.display();
+  // Llamada a display de la esfera desactivada temporalmente
+  // esfera.display();
 }
 
 
